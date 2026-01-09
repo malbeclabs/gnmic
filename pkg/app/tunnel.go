@@ -163,6 +163,8 @@ func (a *App) tunServerAddTargetSubscribeHandler(tt tunnel.Target) error {
 	a.targetsChan <- t
 	a.wg.Add(1)
 	go a.subscribeStream(a.ctx, tc)
+	// Start GET polling for this tunnel target
+	go a.StartGetPollerForTarget(a.ctx, tc)
 	return nil
 }
 

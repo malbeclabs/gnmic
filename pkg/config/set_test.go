@@ -31,7 +31,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"updates": [
@@ -68,7 +68,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"replaces": [
@@ -105,7 +105,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"deletes": [
@@ -132,7 +132,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"updates": [
@@ -187,7 +187,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"replaces": [
@@ -242,7 +242,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"deletes": [
@@ -276,7 +276,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{template.Must(template.New("set-request").Parse(`{
 				"updates": [
 					{
@@ -344,7 +344,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "json",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`replaces:
 {{- range $interface := index .Vars .TargetName "interfaces" }}
@@ -406,7 +406,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 		in: &Config{
 			GlobalFlags{},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"replaces": [
@@ -441,7 +441,7 @@ var createSetRequestFromFileTestSet = map[string]struct {
 				Encoding: "ascii",
 			},
 			LocalFlags{},
-			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
+			nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil,
 			[]*template.Template{
 				template.Must(template.New("set-request").Parse(`{
 				"updates": [

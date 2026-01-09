@@ -131,6 +131,7 @@ type TargetConfig struct {
 	SkipVerify    *bool             `mapstructure:"skip-verify,omitempty" yaml:"skip-verify,omitempty" json:"skip-verify,omitempty"`
 	TLSServerName string            `mapstructure:"tls-server-name,omitempty" yaml:"tls-server-name,omitempty" json:"tls-server-name,omitempty"`
 	Subscriptions []string          `mapstructure:"subscriptions,omitempty" yaml:"subscriptions,omitempty" json:"subscriptions,omitempty"`
+	Gets          []string          `mapstructure:"gets,omitempty" yaml:"gets,omitempty" json:"gets,omitempty"`
 	Outputs       []string          `mapstructure:"outputs,omitempty" yaml:"outputs,omitempty" json:"outputs,omitempty"`
 	BufferSize    uint              `mapstructure:"buffer-size,omitempty" yaml:"buffer-size,omitempty" json:"buffer-size,omitempty"`
 	RetryTimer    time.Duration     `mapstructure:"retry,omitempty" yaml:"retry-timer,omitempty" json:"retry-timer,omitempty"`
@@ -187,6 +188,7 @@ func (tc *TargetConfig) DeepCopy() *TargetConfig {
 		Timeout:          tc.Timeout,
 		TLSServerName:    tc.TLSServerName,
 		Subscriptions:    make([]string, 0, len(tc.Subscriptions)),
+		Gets:             make([]string, 0, len(tc.Gets)),
 		Outputs:          make([]string, 0, len(tc.Outputs)),
 		BufferSize:       tc.BufferSize,
 		RetryTimer:       tc.RetryTimer,
@@ -237,6 +239,7 @@ func (tc *TargetConfig) DeepCopy() *TargetConfig {
 		ntc.Encoding = tc.Encoding
 	}
 	ntc.Subscriptions = append(ntc.Subscriptions, tc.Subscriptions...)
+	ntc.Gets = append(ntc.Gets, tc.Gets...)
 	ntc.Outputs = append(ntc.Outputs, tc.Outputs...)
 	ntc.ProtoFiles = append(ntc.ProtoFiles, tc.ProtoFiles...)
 	ntc.ProtoDirs = append(ntc.ProtoDirs, tc.ProtoDirs...)

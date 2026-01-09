@@ -56,6 +56,7 @@ type Config struct {
 
 	Targets       map[string]*types.TargetConfig       `mapstructure:"targets,omitempty" json:"targets,omitempty" yaml:"targets,omitempty"`
 	Subscriptions map[string]*types.SubscriptionConfig `mapstructure:"subscriptions,omitempty" json:"subscriptions,omitempty" yaml:"subscriptions,omitempty"`
+	Gets          map[string]*types.GetConfig          `mapstructure:"gets,omitempty" json:"gets,omitempty" yaml:"gets,omitempty"`
 	Outputs       map[string]map[string]interface{}    `mapstructure:"outputs,omitempty" json:"outputs,omitempty" yaml:"outputs,omitempty"`
 	Inputs        map[string]map[string]interface{}    `mapstructure:"inputs,omitempty" json:"inputs,omitempty" yaml:"inputs,omitempty"`
 	Processors    map[string]map[string]interface{}    `mapstructure:"processors,omitempty" json:"processors,omitempty" yaml:"processors,omitempty"`
@@ -280,6 +281,7 @@ func New() *Config {
 		viper.NewWithOptions(viper.KeyDelimiter("/")),
 		make(map[string]*types.TargetConfig),
 		make(map[string]*types.SubscriptionConfig),
+		make(map[string]*types.GetConfig),
 		make(map[string]map[string]interface{}),
 		make(map[string]map[string]interface{}),
 		make(map[string]map[string]interface{}),

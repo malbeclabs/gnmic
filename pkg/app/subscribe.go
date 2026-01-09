@@ -212,6 +212,10 @@ func (a *App) readConfigs() error {
 	if err != nil {
 		return fmt.Errorf("failed reading event processors config: %v", err)
 	}
+	_, err = a.Config.GetGets()
+	if err != nil {
+		return fmt.Errorf("failed reading gets config: %v", err)
+	}
 	_, err = a.LoadProtoFiles()
 	if err != nil {
 		return fmt.Errorf("failed loading proto files: %v", err)
@@ -565,6 +569,9 @@ func (a *App) startIO() {
 	go a.StartTargetsManager(a.ctx)
 	a.InitOutputs(a.ctx)
 	a.InitInputs(a.ctx)
+
+	// Start the Get poller for periodic Get requests
+	go a.StartGetPoller(a.ctx)
 
 	if !a.inCluster() {
 		go a.startLoader(a.ctx)
