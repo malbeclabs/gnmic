@@ -1,0 +1,115 @@
+# gnmic configuration example: Periodic Gets with File and Kafka outputs
+#
+# This example demonstrates how to use the 'gets' feature to poll data
+# at regular intervals instead of using streaming subscriptions.
+#
+# Gets are useful for:
+# - Counter data that doesn't need real-time streaming
+# - Configuration backups at regular intervals
+# - Polling devices that don't support streaming subscriptions
+# - Reducing connection overhead compared to persistent streams
+
+username: admin
+password: admin
+insecure: true
+log: true
+
+# Target devices to poll
+targets:
+  router1:
+    address: router1:57400
+    # Optionally specify which gets apply to this target
+    gets:
+      - interface_counters
+      - system_health
+  router2:
+    address: router2:57400
+    gets:
+      - interface_counters
+
+# Periodic Get configurations
+gets:
+  # Poll interface counters every 30 seconds
+  interface_counters:
+    paths:
+      - /interfaces/interface/state/counters/in-octets
+      - /interfaces/interface/state/counters/out-octets
+      - /interfaces/interface/state/counters/in-unicast-pkts
+      - /interfaces/interface/state/counters/out-unicast-pkts
+      - /interfaces/interface/state/counters/in-errors
+      - /interfaces/interface/state/counters/out-errors
+    interval: 30s
+    type: STATE
+    encoding: json
+    outputs:
+      - kafka_out
+      - file_counters
+
+  # Poll system health metrics every minute
+  system_health:
+    paths:
+      - /system/memory/state
+      - /system/cpus/cpu/state
+    interval: 60s
+    type: STATE
+    encoding: json
+    outputs:
+      - kafka_out
+      - file_health
+
+  # Backup full configuration every hour
+  config_backup:
+    paths:
+      - /
+    interval: 1h
+    type: CONFIG
+    encoding: json
+    outputs:
+      - file_config
+    # Only apply to specific targets
+    targets:
+      - router1
+
+# You can also use subscriptions alongside gets
+subscriptions:
+  # Stream interface state changes in real-time
+  interface_events:
+    paths:
+      - /interfaces/interface/state/oper-status
+      - /interfaces/interface/state/admin-status
+    stream-mode: on-change
+    encoding: json
+    outputs:
+      - kafka_out
+
+# Output configurations
+outputs:
+  # Kafka output for telemetry data
+  kafka_out:
+    type: kafka
+    address: kafka:9092
+    topic: gnmi-telemetry
+    format: event
+    num-workers: 1
+    debug: false
+
+  # File output for counter data
+  file_counters:
+    type: file
+    filename: /var/log/gnmic/counters.json
+    format: event
+    file-type: regular
+
+  # File output for health metrics
+  file_health:
+    type: file
+    filename: /var/log/gnmic/health.json
+    format: event
+    file-type: regular
+
+  # File output for configuration backups
+  file_config:
+    type: file
+    filename: /var/log/gnmic/config-backup.json
+    format: json
+    file-type: regular

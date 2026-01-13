@@ -39,6 +39,8 @@ nav:
       
       - Subscriptions: user_guide/subscriptions.md
 
+      - Gets: user_guide/gets.md
+
       - Prompt mode: user_guide/prompt_suggestions.md
     
       - gNMI Server: user_guide/gnmi_server.md
