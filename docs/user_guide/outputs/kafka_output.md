@@ -36,10 +36,12 @@ outputs:
       user:
       # SASL password
       password:
-      # SASL mechanism: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512 and OAUTHBEARER are supported
+      # SASL mechanism: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512, OAUTHBEARER, and AWS_MSK_IAM are supported
       mechanism:
       # token url for OAUTHBEARER SASL mechanism
       token-url:
+      # AWS region for AWS_MSK_IAM mechanism (optional if AWS_REGION env var is set)
+      aws-region:
     # tls config
     tls:
       # string, path to the CA certificate file,
@@ -250,6 +252,95 @@ their configuration is controlled via both `.tls` and `.sasl` fields under the o
         # other fields
         # no sasl field
     ```
+
+### AWS MSK IAM Authentication
+
+`gnmic` supports IAM-based authentication for AWS MSK (Managed Streaming for Apache Kafka), including MSK Serverless clusters. This authentication method uses the AWS SDK default credential chain, making it ideal for Kubernetes deployments with IAM Roles for Service Accounts (IRSA).
+
+#### Configuration
+
+To enable AWS MSK IAM authentication, set the SASL mechanism to `AWS_MSK_IAM`:
+
+```yaml
+outputs:
+  msk-output:
+    type: kafka
+    address: b-1.mycluster.xxx.kafka.us-east-1.amazonaws.com:9098
+    topic: telemetry
+    sasl:
+      mechanism: AWS_MSK_IAM
+      aws-region: us-east-1  # Optional: defaults to AWS_REGION env var
+```
+
+**Notes:**
+
+- TLS is automatically enabled when using AWS MSK IAM (required by AWS)
+- The `aws-region` field is optional if `AWS_REGION` or `AWS_DEFAULT_REGION` environment variables are set
+- User and password fields are not required for AWS MSK IAM
+
+#### Credential Sources
+
+AWS MSK IAM authentication uses the AWS SDK default credential chain, which checks the following sources in order:
+
+1. **Environment variables**: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_SESSION_TOKEN`
+2. **IAM Roles for Service Accounts (IRSA)**: Automatic credential injection in EKS
+3. **EC2 Instance Profile**: Automatic credentials from EC2 metadata service
+4. **ECS Task Role**: Automatic credentials for ECS tasks
+5. **Shared credentials file**: `~/.aws/credentials`
+
+#### Kubernetes with IRSA
+
+For EKS deployments using IAM Roles for Service Accounts:
+
+1. Create an IAM role with the appropriate MSK permissions
+2. Associate the role with your Kubernetes service account
+3. Deploy gnmic with the annotated service account
+
+Example IAM policy for MSK access:
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:Connect",
+        "kafka-cluster:DescribeCluster"
+      ],
+      "Resource": "arn:aws:kafka:REGION:ACCOUNT:cluster/CLUSTER_NAME/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:*Topic*",
+        "kafka-cluster:WriteData",
+        "kafka-cluster:ReadData"
+      ],
+      "Resource": "arn:aws:kafka:REGION:ACCOUNT:topic/CLUSTER_NAME/*"
+    },
+    {
+      "Effect": "Allow",
+      "Action": [
+        "kafka-cluster:AlterGroup",
+        "kafka-cluster:DescribeGroup"
+      ],
+      "Resource": "arn:aws:kafka:REGION:ACCOUNT:group/CLUSTER_NAME/*"
+    }
+  ]
+}
+```
+
+Example Kubernetes service account annotation:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: gnmic
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::ACCOUNT:role/gnmic-msk-role
+```
 
 ### Kafka Output Metrics
 

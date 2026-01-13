@@ -235,6 +235,11 @@ func (k *kafkaOutput) setDefaults() error {
 		if k.cfg.SASL.TokenURL == "" {
 			return errors.New("missing token-url for kafka SASL mechanism OAUTHBEARER")
 		}
+	case "AWS_MSK_IAM":
+		// TLS is required for AWS MSK IAM authentication
+		if k.cfg.TLS == nil {
+			k.cfg.TLS = new(types.TLSConfig)
+		}
 	}
 
 	switch k.cfg.RequiredAcks {
@@ -515,6 +520,9 @@ func (k *kafkaOutput) createConfig() (*sarama.Config, error) {
 			}
 		case sarama.SASLTypeOAuth:
 			cfg.Net.SASL.TokenProvider = pkgutils.NewTokenProvider(cfg.Net.SASL.User, cfg.Net.SASL.Password, k.cfg.SASL.TokenURL)
+		case "AWS_MSK_IAM":
+			cfg.Net.SASL.Mechanism = sarama.SASLTypeOAuth
+			cfg.Net.SASL.TokenProvider = pkgutils.NewMSKTokenProvider(k.cfg.SASL.AWSRegion)
 		}
 	}
 	// SSL or SASL_SSL
