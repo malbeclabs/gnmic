@@ -9,3 +9,4 @@ gnmic
 *.tmp
 *.work*
 .idea
+.DS_Store
