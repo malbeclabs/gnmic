@@ -107,9 +107,10 @@ type App struct {
 	// gRPC server where the tunnel service will be registered
 	grpcTunnelSrv *grpc.Server
 	tunServer     *tunnel.Server
-	ttm           *sync.RWMutex
-	tunTargets    map[tunnel.Target]struct{}
-	tunTargetCfn  map[tunnel.Target]context.CancelFunc
+	ttm              *sync.RWMutex
+	tunTargets       map[tunnel.Target]struct{}
+	tunTargetCfn     map[tunnel.Target]context.CancelFunc
+	tunTargetGetCfn  map[tunnel.Target]context.CancelFunc
 	// processors plugin manager
 	pm *plugin_manager.PluginManager
 
@@ -150,9 +151,10 @@ func New() *App {
 		wg:        new(sync.WaitGroup),
 		printLock: new(sync.Mutex),
 		// tunnel server
-		ttm:          new(sync.RWMutex),
-		tunTargets:   make(map[tunnel.Target]struct{}),
-		tunTargetCfn: make(map[tunnel.Target]context.CancelFunc),
+		ttm:             new(sync.RWMutex),
+		tunTargets:      make(map[tunnel.Target]struct{}),
+		tunTargetCfn:    make(map[tunnel.Target]context.CancelFunc),
+		tunTargetGetCfn: make(map[tunnel.Target]context.CancelFunc),
 
 		// pprof
 		pprof: newPprofServer(),
