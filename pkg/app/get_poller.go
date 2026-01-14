@@ -266,6 +266,8 @@ func (a *App) LoadGetsConfig() error {
 
 // StartGetPollerForTarget starts GET polling for a specific target.
 // This is used when tunnel targets connect dynamically after startup.
+// For tunnel targets, the caller should pass a cancellable context so that
+// get pollers can be stopped when the tunnel target disconnects.
 func (a *App) StartGetPollerForTarget(ctx context.Context, tc *types.TargetConfig) {
 	if len(a.Config.Gets) == 0 {
 		return

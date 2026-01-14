@@ -150,8 +150,24 @@ func (a *App) tunServerAddTargetSubscribeHandler(tt tunnel.Target) error {
 		return nil
 	}
 	a.ttm.Lock()
+	// Cancel any existing subscription context for this target to handle reconnection
+	// This ensures the old subscription stops before starting a new one
+	if oldCancel, ok := a.tunTargetCfn[tt]; ok {
+		oldCancel()
+		delete(a.tunTargetCfn, tt)
+	}
+	// Cancel any existing get poller context for this target to handle reconnection
+	// This prevents the old connection's deregister from canceling the new connection's context
+	if oldCancel, ok := a.tunTargetGetCfn[tt]; ok {
+		oldCancel()
+		delete(a.tunTargetGetCfn, tt)
+	}
 	a.tunTargets[tt] = struct{}{}
 	a.AddTargetConfig(tc)
+	// Create cancellable context for get pollers and store the cancel function
+	// BEFORE starting the goroutine to avoid race conditions
+	getCtx, getCancel := context.WithCancel(a.ctx)
+	a.tunTargetGetCfn[tt] = getCancel
 	a.ttm.Unlock()
 
 	a.operLock.Lock()
@@ -163,8 +179,8 @@ func (a *App) tunServerAddTargetSubscribeHandler(tt tunnel.Target) error {
 	a.targetsChan <- t
 	a.wg.Add(1)
 	go a.subscribeStream(a.ctx, tc)
-	// Start GET polling for this tunnel target
-	go a.StartGetPollerForTarget(a.ctx, tc)
+	// Start GET polling for this tunnel target with the cancellable context
+	go a.StartGetPollerForTarget(getCtx, tc)
 	return nil
 }
 
@@ -172,14 +188,27 @@ func (a *App) tunServerDeleteTargetHandler(tt tunnel.Target) error {
 	a.Logger.Printf("tunnel server target %+v deregister request", tt)
 	a.ttm.Lock()
 	defer a.ttm.Unlock()
+	// Cancel get pollers for this tunnel target
+	if cfn, ok := a.tunTargetGetCfn[tt]; ok {
+		cfn()
+		delete(a.tunTargetGetCfn, tt)
+	}
+	// Cancel subscriptions for this tunnel target
 	if cfn, ok := a.tunTargetCfn[tt]; ok {
 		cfn()
 		delete(a.tunTargetCfn, tt)
-		delete(a.tunTargets, tt)
-		a.configLock.Lock()
-		delete(a.Config.Targets, tt.ID)
-		a.configLock.Unlock()
 	}
+	delete(a.tunTargets, tt)
+	a.configLock.Lock()
+	delete(a.Config.Targets, tt.ID)
+	a.configLock.Unlock()
+	// Close and remove the Target to ensure fresh state on reconnection
+	a.operLock.Lock()
+	if t, ok := a.Targets[tt.ID]; ok {
+		t.Close()
+		delete(a.Targets, tt.ID)
+	}
+	a.operLock.Unlock()
 	return nil
 }
 
