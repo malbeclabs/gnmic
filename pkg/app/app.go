@@ -110,6 +110,7 @@ type App struct {
 	ttm           *sync.RWMutex
 	tunTargets    map[tunnel.Target]struct{}
 	tunTargetCfn  map[tunnel.Target]context.CancelFunc
+	tunGetCfn     map[tunnel.Target]context.CancelFunc
 	// processors plugin manager
 	pm *plugin_manager.PluginManager
 
@@ -153,6 +154,7 @@ func New() *App {
 		ttm:          new(sync.RWMutex),
 		tunTargets:   make(map[tunnel.Target]struct{}),
 		tunTargetCfn: make(map[tunnel.Target]context.CancelFunc),
+		tunGetCfn:    make(map[tunnel.Target]context.CancelFunc),
 
 		// pprof
 		pprof: newPprofServer(),

@@ -163,8 +163,15 @@ func (a *App) tunServerAddTargetSubscribeHandler(tt tunnel.Target) error {
 	a.targetsChan <- t
 	a.wg.Add(1)
 	go a.subscribeStream(a.ctx, tc)
-	// Start GET polling for this tunnel target
-	go a.StartGetPollerForTarget(a.ctx, tc)
+
+	// Start GET polling for this tunnel target using a per-target context so
+	// the poller is stopped cleanly when the target deregisters, preventing
+	// poller goroutine accumulation across reconnect cycles.
+	getCtx, getCancel := context.WithCancel(a.ctx)
+	a.ttm.Lock()
+	a.tunGetCfn[tt] = getCancel
+	a.ttm.Unlock()
+	go a.StartGetPollerForTarget(getCtx, tc)
 	return nil
 }
 
@@ -175,11 +182,15 @@ func (a *App) tunServerDeleteTargetHandler(tt tunnel.Target) error {
 	if cfn, ok := a.tunTargetCfn[tt]; ok {
 		cfn()
 		delete(a.tunTargetCfn, tt)
-		delete(a.tunTargets, tt)
-		a.configLock.Lock()
-		delete(a.Config.Targets, tt.ID)
-		a.configLock.Unlock()
 	}
+	if cfn, ok := a.tunGetCfn[tt]; ok {
+		cfn()
+		delete(a.tunGetCfn, tt)
+	}
+	delete(a.tunTargets, tt)
+	a.configLock.Lock()
+	delete(a.Config.Targets, tt.ID)
+	a.configLock.Unlock()
 	return nil
 }
 
