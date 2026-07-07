@@ -9,6 +9,7 @@ replace github.com/openconfig/gnmic/pkg/cache v0.1.3 => ./pkg/cache
 require (
 	github.com/IBM/sarama v1.46.1
 	github.com/adrg/xdg v0.5.3
+	github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4
 	github.com/c-bata/go-prompt v0.2.6
 	github.com/docker/docker v28.5.1+incompatible
 	github.com/fsnotify/fsnotify v1.9.0
@@ -85,7 +86,6 @@ require (
 	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/apparentlymart/go-cidr v1.1.0 // indirect
 	github.com/armon/go-radix v1.0.0 // indirect
-	github.com/aws/aws-msk-iam-sasl-signer-go v1.0.4 // indirect
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.11.14 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.34 // indirect
@@ -273,7 +273,7 @@ require (
 	github.com/nats-io/nats-server/v2 v2.10.27 // indirect
 	github.com/nats-io/nkeys v0.4.11 // indirect
 	github.com/nats-io/nuid v1.0.1 // indirect
-	github.com/openconfig/grpctunnel v0.1.0
+	github.com/openconfig/grpctunnel v0.2.0
 	github.com/opencontainers/go-digest v1.0.0 // indirect
 	github.com/opencontainers/image-spec v1.0.2 // indirect
 	github.com/pierrec/lz4 v2.6.1+incompatible // indirect
